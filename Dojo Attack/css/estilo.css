@@ -1,0 +1,47 @@
+/* body {
+    color: white;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 20px;
+	background-color: black;
+}
+
+p {
+    color: green;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 20px;
+}
+
+#topo{
+    width: 80%;
+	text-align: center;
+}
+
+#perfil{
+    width: 25%;
+	float: left;
+}
+
+#perfil:hover{
+    width: 27%;
+	background-color: yellow;
+    border-width: 4px;
+}
+
+#sobre{
+    width: 70%;
+	float: right;
+}
+
+img{
+	max-width:100%;
+	max-height:100%;
+    display: block;
+    margin: 0 auto;
+}
+
+div {
+    width: 25%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+} */
