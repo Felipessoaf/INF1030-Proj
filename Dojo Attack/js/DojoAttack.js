@@ -61,6 +61,9 @@ onload = function () {
         currentScreen = ScreensEnum.game;
     }));
 
+    GameStarted = false;
+    GameRunning = false;
+
     canvas.addEventListener('click', function(evt)
     {
         ClickHandler(evt);
@@ -99,7 +102,7 @@ function draw()
     
     switch(currentScreen) {
         case ScreensEnum.menu:
-            drawMenu()
+            drawMenu();
             break;
         case ScreensEnum.game:
             drawGame();
@@ -135,7 +138,21 @@ function drawMenu()
 
 function drawGame()
 {
-    writeOnCanvas(ctx, "Game On!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
+    if(!GameRunning)
+    {
+        writeOnCanvas(ctx, "Game On!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
+        if(!GameStarted)
+        {
+            GameStarted = true; 
+            setTimeout(function () {
+                GameRunning = true; 
+            }, 500);
+        }
+    }
+    else
+    {
+
+    }
 }
 
 function drawEnd()
