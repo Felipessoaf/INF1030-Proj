@@ -13,8 +13,8 @@ function Button(name, screen, pos, width, height, onClick)
     {
         if(screen == currentScreen)
         {
-            if(click.x > this.pos.x && click.x < this.pos.x + this.width 
-                && click.y < this.pos.y + this.height && click.y > this.pos.y)
+            if(click.x > this.pos[0] && click.x < this.pos[0] + this.width 
+                && click.y < this.pos[1] + this.height && click.y > this.pos[1])
             {
                 onClick();
             }
@@ -25,14 +25,14 @@ function Button(name, screen, pos, width, height, onClick)
     {
         if(screen == currentScreen)
         {
-            ctx.rect(this.pos.x, this.pos.y, this.width, this.height); 
+            ctx.rect(this.pos[0], this.pos[1], this.width, this.height); 
             ctx.fillStyle = '#FFFFFF'; 
             ctx.strokeStyle = '#000000'; 
             ctx.lineWidth = 2;
             ctx.fill(); 
             ctx.stroke();
             
-            writeOnCanvas(ctx, name, "32pt arial", "black", this.pos.x + this.width/2, this.pos.y + this.height/2, "center");
+            writeOnCanvas(ctx, this.name, "32pt arial", "black", this.pos[0] + this.width/2, this.pos[1] + this.height/2, "center");
         }
     }
 }
@@ -51,23 +51,23 @@ function Enemy(posX, posY, speed)
 //____________________________________________//
 
 onload = function () {
-
-    Buttons = new Array();
-    Buttons.push(new Button("Start", ScreensEnum.menu, [canvas.width/2,canvas.height/2], 30, 10, function()
-    {
-        currentScreen = ScreensEnum.game;
-    }));
-
-    currentScreen = ScreensEnum.menu;
-    setInterval(draw,30);
     
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+
+    Buttons = new Array();
+    Buttons.push(new Button("Start", ScreensEnum.menu, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
+    {
+        currentScreen = ScreensEnum.game;
+    }));
 
     canvas.addEventListener('click', function(evt)
     {
         ClickHandler(evt);
     }, false);
+
+    currentScreen = ScreensEnum.menu;
+    setInterval(draw,30);
 }
 
 function getMousePos(canvas, event) 
@@ -122,6 +122,7 @@ function writeOnCanvas(c, texto, fonte, corfonte, posX, posY, align)
 {
 	c.font = fonte;
     c.textAlign = align;
+    c.textBaseline = "middle";
 
     c.fillStyle = corfonte;
     c.fillText(texto, posX, posY);
@@ -129,7 +130,7 @@ function writeOnCanvas(c, texto, fonte, corfonte, posX, posY, align)
 
 function drawMenu()
 {
-    writeOnCanvas(ctx, "Dojo Attack", "32pt arial", "black", canvas.width/2, 75, "center");
+    writeOnCanvas(ctx, "Dojo Attack", "32pt arial", "black", canvas.width/2, 70, "center");
 }
 
 function drawGame()
