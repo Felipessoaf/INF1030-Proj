@@ -1,7 +1,7 @@
 var ScreensEnum = Object.freeze({"menu":1, "game":2, "end":3});
 var currentScreen;
 
-//_________________Classes_____________________//
+//********************************Classes******************************************
 function Button(name, screen, pos, width, height, onClick)
 {
     this.pos = pos;
@@ -40,6 +40,15 @@ function Button(name, screen, pos, width, height, onClick)
 function Player(initialLife)
 {
     this.life = initialLife;
+
+    this.damage = function()
+    {
+        this.life--;
+        if(this.life <= 0)
+        {
+            currentScreen = ScreensEnum.end;
+        }
+    }
 }
 
 function Enemy(posX, posY, speed)
@@ -48,7 +57,7 @@ function Enemy(posX, posY, speed)
     this.posY = posY;
     this.speed = speed;
 }
-//____________________________________________//
+//**********************************************************************************
 
 onload = function () {
     
@@ -60,6 +69,10 @@ onload = function () {
     {
         currentScreen = ScreensEnum.game;
     }));
+    Buttons.push(new Button("Menu", ScreensEnum.end, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
+    {
+        currentScreen = ScreensEnum.menu;
+    }));
 
     GameStarted = false;
     GameRunning = false;
@@ -70,7 +83,7 @@ onload = function () {
     }, false);
 
     currentScreen = ScreensEnum.menu;
-    setInterval(draw,30);
+    setInterval(update,30);
 }
 
 function getMousePos(canvas, event) 
@@ -91,7 +104,7 @@ function ClickHandler(event)
     });
 }
 
-function draw()
+function update()
 {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
@@ -151,8 +164,20 @@ function drawGame()
     }
     else
     {
-
+        drawPlayer();
+        drawEnemies();
     }
+}
+
+function drawPlayer()
+{
+    var image = document.getElementById("playeridleimg");
+    ctx.drawImage(image, canvas.width/2, canvas.height/2, image.width/5, image.height/5); 
+}
+
+function drawEnemies()
+{
+    
 }
 
 function drawEnd()

@@ -1,11 +1,11 @@
 # INF1030-Proj
 Feito:
-- Criação das pastas e arquivos organização dos mesmos
-- Início da implementação de telas do jogo
+- Terminar sistema de telas do jogo
+- Criação de classes para representar player e inimigos
+- Criação da classe botão
+- Reorganização básica de estrutura
 
 Próximos passos:
-- Terminar sistema de telas do jogo
-- Implementar player no jogo com uma mecanica básica de ataque
-- Implementar inimigo
+- Continuar implementação do player e inimigos
 - Implementar sistema de spawn aleatório de inimigo
 - Implementar sistema de pontuação
