@@ -37,9 +37,14 @@ function Button(name, screen, pos, width, height, onClick)
     }
 }
 
-function Player(initialLife)
+function Player(startLife)
 {
-    this.life = initialLife;
+    this.life = startLife;
+    var idleimage = document.getElementById("playeridleimg");
+    var leftimage = document.getElementById("playerleftimg");
+    var rightimage = document.getElementById("playerrightimg");
+    var currentImage = idleimage;
+    var pos = [canvas.width/2 - idleimage.width/10 - 30, canvas.height/2];
 
     this.damage = function()
     {
@@ -49,13 +54,40 @@ function Player(initialLife)
             currentScreen = ScreensEnum.end;
         }
     }
+
+    this.checkHit = function(hitRect, obj)
+    {
+        if((hitRect.x > this.pos[0] && hitRect.x < this.pos[0] + this.width) ||
+            (hitRect.x + hitRect.width > this.pos[0] && hitRect.x + hitRect.width < this.pos[0] + this.width))
+        {
+            var index = Enemies.indexOf(obj);
+            if(index >= 0)
+            {
+                Enemies.splice(index, 1 );
+                damage();
+            }
+        }
+    }
+
+    this.draw = function()
+    {
+        ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+    }
 }
 
-function Enemy(posX, posY, speed)
+function Enemy(posX, posY, width, height, speed)
 {
     this.posX = posX;
     this.posY = posY;
     this.speed = speed;
+
+    this.rect = 
+    {
+        x:posX,
+        y:posY,
+        width:width,
+        height:height
+    }
 }
 //**********************************************************************************
 
@@ -64,15 +96,21 @@ onload = function () {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
 
+    initialLife = 3;
+    player = new Player(initialLife);
+
     Buttons = new Array();
     Buttons.push(new Button("Start", ScreensEnum.menu, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
     {
+        player.life = initialLife;
         currentScreen = ScreensEnum.game;
     }));
     Buttons.push(new Button("Menu", ScreensEnum.end, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
     {
         currentScreen = ScreensEnum.menu;
     }));
+
+    Enemies = new Array();
 
     GameStarted = false;
     GameRunning = false;
@@ -93,6 +131,16 @@ function getMousePos(canvas, event)
         x: event.clientX - rect.left,
         y: event.clientY - rect.top
     };
+}
+
+function writeOnCanvas(c, texto, fonte, corfonte, posX, posY, align)
+{
+	c.font = fonte;
+    c.textAlign = align;
+    c.textBaseline = "middle";
+
+    c.fillStyle = corfonte;
+    c.fillText(texto, posX, posY);
 }
 
 function ClickHandler(event)
@@ -134,16 +182,6 @@ function drawBackground()
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height); 
 }
 
-function writeOnCanvas(c, texto, fonte, corfonte, posX, posY, align)
-{
-	c.font = fonte;
-    c.textAlign = align;
-    c.textBaseline = "middle";
-
-    c.fillStyle = corfonte;
-    c.fillText(texto, posX, posY);
-}
-
 function drawMenu()
 {
     writeOnCanvas(ctx, "Dojo Attack", "32pt arial", "black", canvas.width/2, 70, "center");
@@ -159,7 +197,7 @@ function drawGame()
             GameStarted = true; 
             setTimeout(function () {
                 GameRunning = true; 
-            }, 500);
+            }, 1000);
         }
     }
     else
@@ -171,8 +209,7 @@ function drawGame()
 
 function drawPlayer()
 {
-    var image = document.getElementById("playeridleimg");
-    ctx.drawImage(image, canvas.width/2 - image.width/10 - 30, canvas.height/2, image.width/5, image.height/5); 
+    player.draw();
 }
 
 function drawEnemies()
