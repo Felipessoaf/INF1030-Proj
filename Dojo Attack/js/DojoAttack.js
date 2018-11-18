@@ -172,7 +172,7 @@ function drawGame()
 function drawPlayer()
 {
     var image = document.getElementById("playeridleimg");
-    ctx.drawImage(image, canvas.width/2, canvas.height/2, image.width/5, image.height/5); 
+    ctx.drawImage(image, canvas.width/2 - image.width/10 - 30, canvas.height/2, image.width/5, image.height/5); 
 }
 
 function drawEnemies()
