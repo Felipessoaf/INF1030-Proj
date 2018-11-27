@@ -45,6 +45,26 @@ function Player(startLife)
     var rightimage = document.getElementById("playerrightimg");
     var currentImage = idleimage;
     var pos = [canvas.width/2 - idleimage.width/10 - 30, canvas.height/2];
+    var StateEnum = Object.freeze({"left":1, "idle":2, "right":3});
+    var currentState = StateEnum.idle;
+    var canAttack = true;
+    var attacked = false;
+
+    this.leftRect = 
+    {
+        x:this.pos,
+        y:this.posY,
+        width:200,
+        height:100
+    }
+
+    this.rightRect = 
+    {
+        x:this.pos,
+        y:this.posY,
+        width:200,
+        height:100
+    }
 
     this.damage = function()
     {
@@ -71,22 +91,118 @@ function Player(startLife)
 
     this.draw = function()
     {
-        ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+        switch(currentState) {
+            case StateEnum.idle:
+                currentImage = idleimage;
+                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                break;
+            case StateEnum.left:
+                currentImage = leftimage;
+                ctx.drawImage(currentImage, pos[0]-70, pos[1], currentImage.width/5, currentImage.height/5); 
+                break;
+            case StateEnum.right:
+                currentImage = rightimage;
+                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                break;
+            default:
+                break;
+        }
+    }
+
+    this.AttackLeft = function()
+    {
+        if(canAttack)
+        {
+            canAttack = false;
+            attacked = true;
+            currentState = StateEnum.left;
+            this.checkAttack(this.leftRect);
+    
+            setTimeout(function () {
+                currentState = StateEnum.idle;
+            }, 500);
+        }
+    }
+
+    this.AttackRight = function()
+    {
+        if(canAttack)
+        {
+            canAttack = false;
+            attacked = true;
+            currentState = StateEnum.right;
+            this.checkAttack(this.rightRect);
+    
+            setTimeout(function () {
+                currentState = StateEnum.idle;
+            }, 500);
+        }
+    }
+
+    this.Stop = function()
+    {
+        if(attacked)
+        {
+            attacked = false;
+            currentState = StateEnum.idle;
+            setTimeout(function () {
+                canAttack = true;
+            }, 500);
+        }
+    }
+
+    this.checkAttack = function(rect) 
+    {        
+        for (var i = 0; i < Enemies.length; i++) 
+        {
+            var item = Enemies[i];
+            if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
+                (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
+            {
+                Enemies.splice(i, 1 );
+                i--;
+            }
+        }
+        /* Enemies.forEach(function(item, index){
+            if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
+                (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
+            {
+                var index = Enemies.indexOf(obj);
+                if(index >= 0)
+                {
+                    Enemies.splice(index, 1 );
+                    damage();
+                }
+            }
+        }); */
     }
 }
 
-function Enemy(posX, posY, width, height, speed)
+function Enemy(pos, width, height, speed, src)
 {
-    this.posX = posX;
-    this.posY = posY;
+    this.pos = pos;
     this.speed = speed;
+    this.image = new Image();
+    this.posY = canvas.height/2;
 
     this.rect = 
     {
-        x:posX,
-        y:posY,
+        x:this.pos,
+        y:this.posY,
         width:width,
         height:height
+    }
+
+    this.update = function()
+    {
+        ctx.drawImage(this.image, pos, this.posY, this.image.width/5, this.image.height/5); 
+        this.pos += speed;
+        player.checkHit(this.rect, this);
+    }
+
+    this.die = function()
+    {
+
     }
 }
 //**********************************************************************************
@@ -120,6 +236,16 @@ onload = function () {
         ClickHandler(evt);
     }, false);
 
+    window.addEventListener("keydown", function(evt)
+    {
+        KeyDownHandler(evt);
+    }, false);
+
+    window.addEventListener("keyup", function(evt)
+    {
+        player.Stop();
+    }, false);
+
     currentScreen = ScreensEnum.menu;
     setInterval(update,30);
 }
@@ -150,6 +276,21 @@ function ClickHandler(event)
     Buttons.forEach(function(item, index){
         item.click(mousePos);
     });
+}
+
+function KeyDownHandler(event)
+{
+    switch(event.keyCode)
+    {
+        case 37:
+            player.AttackLeft();
+            break;
+        case 39:
+            player.AttackRight();
+            break;
+        default:
+            break;
+    }
 }
 
 function update()
@@ -214,7 +355,9 @@ function drawPlayer()
 
 function drawEnemies()
 {
-    
+    Enemies.forEach(function(item, index){
+        item.update();
+    });
 }
 
 function drawEnd()
