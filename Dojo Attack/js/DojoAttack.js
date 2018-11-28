@@ -61,7 +61,7 @@ function Player(startLife)
         x:pos[0] - 80,
         y:pos[1],
         width:30,
-        height:20
+        height:100
     }
 
     this.rightRect = 
@@ -69,7 +69,15 @@ function Player(startLife)
         x:pos[0] + 330,
         y:pos[1],
         width:30,
-        height:20
+        height:100
+    }
+
+    this.centerRect = 
+    {
+        x:pos[0] + 50,
+        y:pos[1] + 20,
+        width:idleimage.width/5 - 50,
+        height:idleimage.height/5 - 20
     }
 
     this.damage = function()
@@ -78,6 +86,7 @@ function Player(startLife)
         if(this.life <= 0)
         {
             currentScreen = ScreensEnum.end;
+            clearInterval(spawnIntervalTimer);
         }
     }
 
@@ -96,7 +105,14 @@ function Player(startLife)
     }
 
     this.draw = function()
-    {        
+    {       
+        /* ctx.beginPath();
+        ctx.rect(this.centerRect.x, this.centerRect.y, this.centerRect.width, this.centerRect.height); 
+        ctx.fillStyle = '#FFFFFF'; 
+        ctx.strokeStyle = '#000000'; 
+        ctx.lineWidth = 2;
+        ctx.fill(); 
+        ctx.stroke();  */  
         if(currentMode == ModeEnum.easy)
         {
             ctx.beginPath();
@@ -177,15 +193,6 @@ function Player(startLife)
 
     this.checkAttack = function(rect) 
     {        
-        /* for (var i = 0; i < Enemies.length; i++) 
-        {
-            var item = Enemies[i];
-            if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
-                (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
-            {
-                Enemies[i].die();
-            }
-        } */
         Enemies.forEach(function(item, index){
             if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
                 (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
@@ -200,13 +207,25 @@ function Player(startLife)
     }
 }
 
-function Enemy(pos, width, height, speed, src)
+function Enemy(pos, width, height, speed, left)
 {
     this.pos = pos;
     this.speed = speed;
     this.image = new Image();
     this.posY = canvas.height/2;
     var dead = false;
+    var leftsrc = "../imagens/inimigo/enemyleft.png";
+    var rightsrc = "../imagens/inimigo/enemyright.png";
+    var smokesrc = "../imagens/inimigo/smoke.png";
+
+    if(left)
+    {
+        this.image.src = leftsrc;
+    }
+    else
+    {
+        this.image.src = rightsrc;
+    }
 
     this.rect = 
     {
@@ -226,6 +245,8 @@ function Enemy(pos, width, height, speed, src)
         }
         else
         {
+            this.image.src = smokesrc;
+            this.image.style.display = "none";
             this.pos = 10000;
         }
     }
@@ -253,6 +274,10 @@ onload = function () {
     }));
     Buttons.push(new Button("Menu", ScreensEnum.end, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
     {
+        DifficultyOptions.style.display = "block";
+        
+        Enemies = [];
+        player.life = initialLife;
         currentScreen = ScreensEnum.menu;
     }));
 
@@ -260,6 +285,8 @@ onload = function () {
 
     GameStarted = false;
     GameRunning = false;
+
+    DifficultyOptions = document.getElementById("difficultyOptions");
 
     canvas.addEventListener('click', function(evt)
     {
@@ -338,7 +365,6 @@ function update()
             drawMenu();
             break;
         case ScreensEnum.game:
-            drawGame();
             game();
             break;
         case ScreensEnum.end:
@@ -350,9 +376,49 @@ function update()
 }
 
 function game()
-{
-    spawnEnemies();
+{    
+    if(!GameRunning)
+    {
+        DifficultyOptions.style.display = "none";
+        writeOnCanvas(ctx, "Game On!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
+        if(!GameStarted)
+        {
+            GameStarted = true; 
+            setTimeout(function () {
+                GameRunning = true; 
+                startSpawn();
+            }, 1000);
+        }
+    }
+    else
+    {
+        drawGame();
+    }
+}
 
+function startSpawn()
+{
+    var timeInterval;
+    switch(currentMode) {
+        case ModeEnum.easy:
+            timeInterval = 1.5;
+            break;
+        case ModeEnum.normal:
+            timeInterval = 1;
+            break;
+        case ModeEnum.hard:
+            timeInterval = 0.5;
+            break;
+        default:
+            break;
+    }
+
+    spawnIntervalTimer = setInterval(spawnEnemies, timeInterval);
+}
+
+function spawnEnemies()
+{
+    var rand;
 }
 
 function drawBackground()
@@ -368,23 +434,10 @@ function drawMenu()
 
 function drawGame()
 {
-    if(!GameRunning)
-    {
-        writeOnCanvas(ctx, "Game On!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
-        if(!GameStarted)
-        {
-            GameStarted = true; 
-            setTimeout(function () {
-                GameRunning = true; 
-            }, 1000);
-        }
-    }
-    else
-    {
-        drawPlayer();
-        drawEnemies();
-        drawScore();
-    }
+    drawPlayer();
+    drawEnemies();
+    drawScore();
+    drawLife();
 }
 
 function drawPlayer()
@@ -401,7 +454,12 @@ function drawEnemies()
 
 function drawScore()
 {
-    writeOnCanvas(ctx, player.points, "32pt arial", "black", canvas.width - 100, 70, "center");
+    writeOnCanvas(ctx, "Pontos: "+ player.points, "32pt arial", "black", canvas.width - 100, 70, "center");
+}
+
+function drawLife()
+{
+    writeOnCanvas(ctx, "Vida: "+ player.life, "32pt arial", "black", 100, 70, "center");
 }
 
 function drawEnd()
