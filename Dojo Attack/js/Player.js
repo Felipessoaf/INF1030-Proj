@@ -40,11 +40,9 @@ function Player(startLife)
     this.damage = function()
     {
         this.life--;
-        console.log("life: " + this.life);
         if(this.life <= 0)
         {
             currentScreen = ScreensEnum.end;
-            clearInterval(spawnIntervalTimer);
             GameStarted = false;
             GameRunning = false;
         }
@@ -59,6 +57,7 @@ function Player(startLife)
             if(index >= 0)
             {
                 Enemies[index].die();
+                this.damage();
             }
         }
     }

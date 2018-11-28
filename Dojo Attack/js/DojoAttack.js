@@ -192,8 +192,6 @@ function startSpawn()
         default:
             break;
     }
-
-    //spawnIntervalTimer = setInterval(spawnEnemies, timeInterval * 1000);
 }
 
 function spawnEnemies(min, max)
@@ -269,15 +267,16 @@ function drawEnemies()
 
 function drawScore()
 {
-    writeOnCanvas(ctx, "Pontos: "+ player.points, "32pt arial", "black", canvas.width - 100, 70, "center");
+    writeOnCanvas(ctx, "Pontos: " + player.points, "32pt arial", "black", canvas.width - 100, 70, "center");
 }
 
 function drawLife()
 {
-    writeOnCanvas(ctx, "Vida: "+ player.life, "32pt arial", "black", 100, 70, "center");
+    writeOnCanvas(ctx, "Vida: " + player.life, "32pt arial", "black", 100, 70, "center");
 }
 
 function drawEnd()
 {
-    writeOnCanvas(ctx, "Finish!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
+    writeOnCanvas(ctx, "Finish!", "32pt arial", "black", canvas.width/2, canvas.height/2-100, "center");
+    writeOnCanvas(ctx, "Pontos: " + player.points, "32pt arial", "black", canvas.width/2, canvas.height/2-50, "center");
 }
