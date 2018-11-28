@@ -92,14 +92,13 @@ function Player(startLife)
 
     this.checkHit = function(hitRect, obj)
     {
-        if((hitRect.x > this.pos[0] && hitRect.x < this.pos[0] + this.width) ||
-            (hitRect.x + hitRect.width > this.pos[0] && hitRect.x + hitRect.width < this.pos[0] + this.width))
+        if((hitRect.x > this.centerRect.x && hitRect.x < this.centerRect.x + this.centerRect.width) ||
+            (hitRect.x + hitRect.width > this.centerRect.x && hitRect.x + hitRect.width < this.centerRect.x + this.centerRect.width))
         {
             var index = Enemies.indexOf(obj);
             if(index >= 0)
             {
-                Enemies.splice(index, 1 );
-                damage();
+                Enemies[index].die();
             }
         }
     }
@@ -193,9 +192,10 @@ function Player(startLife)
 
     this.checkAttack = function(rect) 
     {        
+        var middle = rect.x + rect.width/2;
         Enemies.forEach(function(item, index){
-            if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
-                (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
+            if((middle > item.rect.x && item.rect.x < item.rect.x + item.rect.width) ||
+                (middle < item.rect.x && middle > item.rect.x + item.rect.width))
             {
                 if(index >= 0)
                 {
@@ -207,40 +207,42 @@ function Player(startLife)
     }
 }
 
-function Enemy(pos, width, height, speed, left)
+function Enemy(speed, left)
 {
-    this.pos = pos;
+    var pos;
+    var image;
+
+    if(left)
+    {
+        pos = [-50,canvas.height/2];
+        this.image.src = leftsrc;
+    }
+    else
+    {
+        pos = [canvas.width,canvas.height/2];
+        image.src = rightsrc;
+    }
+
     this.speed = speed;
-    this.image = new Image();
-    this.posY = canvas.height/2;
     var dead = false;
     var leftsrc = "../imagens/inimigo/enemyleft.png";
     var rightsrc = "../imagens/inimigo/enemyright.png";
     var smokesrc = "../imagens/inimigo/smoke.png";
 
-    if(left)
-    {
-        this.image.src = leftsrc;
-    }
-    else
-    {
-        this.image.src = rightsrc;
-    }
-
     this.rect = 
     {
-        x:this.pos,
-        y:this.posY,
-        width:width,
-        height:height
+        x:this.pos[0],
+        y:this.pos[1],
+        width:image.width/5,
+        height:image.height/5
     }
 
     this.update = function()
     {
         if(!dead)
         {
-            ctx.drawImage(this.image, pos, this.posY, this.image.width/5, this.image.height/5); 
-            this.pos += speed;
+            ctx.drawImage(this.image, pos[0], pos[1], this.image.width/5, this.image.height/5); 
+            pos[0] += speed;
             player.checkHit(this.rect, this);
         }
         else
@@ -287,6 +289,16 @@ onload = function () {
     GameRunning = false;
 
     DifficultyOptions = document.getElementById("difficultyOptions");
+    Difficulties = new Array();
+    Difficulties.push("Fácil");
+    Difficulties.push("Médio");
+    Difficulties.push("Dificil");
+       
+    Difficulties.forEach(function(item, index){
+        var option = document.createElement("option");
+        option.text = item;
+        DifficultyOptions.add(option);
+    });
 
     canvas.addEventListener('click', function(evt)
     {
@@ -383,6 +395,20 @@ function game()
         writeOnCanvas(ctx, "Game On!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
         if(!GameStarted)
         {
+            switch(DifficultyOptions.selectedIndex) {
+                case 0:
+                    currentMode = ModeEnum.easy;
+                    break;
+                case 1:
+                    currentMode = ModeEnum.normal;
+                    break;
+                case 2:
+                    currentMode = ModeEnum.hard;
+                    break;
+                default:
+                    break;
+            }
+
             GameStarted = true; 
             setTimeout(function () {
                 GameRunning = true; 
@@ -418,7 +444,34 @@ function startSpawn()
 
 function spawnEnemies()
 {
-    var rand;
+    var randVel;
+    var randPos = Math.floor(Math.random() * 2);
+    var pos;
+
+    if(randPos == 0)
+    {
+        pos = [-50,canvas.height/2];
+    }
+    else
+    {
+        pos = [canvas.width,canvas.height/2];
+    }
+    
+    switch(currentMode) {
+        case ModeEnum.easy:
+            randVel = Math.random() * 2 + 0.1;
+            break;
+        case ModeEnum.normal:
+            randVel = Math.random() * 4 + 2.2;
+            break;
+        case ModeEnum.hard:
+            randVel = Math.random() * 6 + 6.7;
+            break;
+        default:
+            break;
+    }
+
+    Enemies.push(new Enemy(pos, 1,1,randVel,!randPos));
 }
 
 function drawBackground()
