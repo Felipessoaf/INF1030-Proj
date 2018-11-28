@@ -1,0 +1,66 @@
+function Enemy(speed, left)
+{
+    var pos;
+
+    this.speed = speed;
+    this.dead = false;
+    this.canUpdate = true;
+
+    var smokeimage = new Image();
+    var leftimage = new Image();
+    var rightimage = new Image();
+    var currentImage;
+
+    leftimage.src = "../imagens/inimigo/enemyleft.png";
+    rightimage.src = "../imagens/inimigo/enemyright.png";
+    smokeimage.src = "../imagens/inimigo/smoke.png";
+
+    if(left)
+    {
+        pos = [-350,canvas.height/2];
+        currentImage = leftimage;
+    }
+    else
+    {
+        pos = [canvas.width,canvas.height/2];
+        currentImage = rightimage;
+    }
+
+    this.rect = 
+    {
+        x:pos[0],
+        y:pos[1],
+        width:currentImage.width/5,
+        height:currentImage.height/5
+    }
+
+    this.update = function()
+    {
+        if(this.canUpdate)
+        {
+            //drawRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height); 
+            if(!this.dead)
+            {
+                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                pos[0] += speed;
+                this.rect.x += speed;
+                player.checkHit(this.rect, this);
+            }
+            else
+            {
+                currentImage = smokeimage;
+                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                setTimeout(function () {
+                    currentImage.style.display = "none";
+                    pos = [10000,10000];
+                    this.canUpdate = false;
+                }, 1000);
+            }
+        }
+    }
+
+    this.die = function()
+    {
+        this.dead = true;
+    }
+}
