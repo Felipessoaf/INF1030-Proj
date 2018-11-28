@@ -1,5 +1,7 @@
 var ScreensEnum = Object.freeze({"menu":1, "game":2, "end":3});
 var currentScreen;
+var ModeEnum = Object.freeze({"easy":1, "normal":2, "hard":3});
+var currentMode;
 
 //********************************Classes******************************************
 function Button(name, screen, pos, width, height, onClick)
@@ -25,12 +27,14 @@ function Button(name, screen, pos, width, height, onClick)
     {
         if(screen == currentScreen)
         {
+            ctx.beginPath();
             ctx.rect(this.pos[0], this.pos[1], this.width, this.height); 
             ctx.fillStyle = '#FFFFFF'; 
             ctx.strokeStyle = '#000000'; 
             ctx.lineWidth = 2;
             ctx.fill(); 
             ctx.stroke();
+            /* ctx.endPath(); */
             
             writeOnCanvas(ctx, this.name, "32pt arial", "black", this.pos[0] + this.width/2, this.pos[1] + this.height/2, "center");
         }
@@ -40,6 +44,8 @@ function Button(name, screen, pos, width, height, onClick)
 function Player(startLife)
 {
     this.life = startLife;
+    this.points = 0;
+
     var idleimage = document.getElementById("playeridleimg");
     var leftimage = document.getElementById("playerleftimg");
     var rightimage = document.getElementById("playerrightimg");
@@ -52,18 +58,18 @@ function Player(startLife)
 
     this.leftRect = 
     {
-        x:this.pos,
-        y:this.posY,
-        width:200,
-        height:100
+        x:pos[0] - 80,
+        y:pos[1],
+        width:30,
+        height:20
     }
 
     this.rightRect = 
     {
-        x:this.pos,
-        y:this.posY,
-        width:200,
-        height:100
+        x:pos[0] + 330,
+        y:pos[1],
+        width:30,
+        height:20
     }
 
     this.damage = function()
@@ -90,7 +96,25 @@ function Player(startLife)
     }
 
     this.draw = function()
-    {
+    {        
+        if(currentMode == ModeEnum.easy)
+        {
+            ctx.beginPath();
+            ctx.rect(this.leftRect.x, this.leftRect.y, this.leftRect.width, this.leftRect.height); 
+            ctx.fillStyle = '#FFFFFF'; 
+            ctx.strokeStyle = '#000000'; 
+            ctx.lineWidth = 2;
+            ctx.fill(); 
+            ctx.stroke();   
+                 
+            ctx.rect(this.rightRect.x, this.rightRect.y, this.rightRect.width, this.rightRect.height); 
+            ctx.fillStyle = '#FFFFFF'; 
+            ctx.strokeStyle = '#000000'; 
+            ctx.lineWidth = 2;
+            ctx.fill(); 
+            ctx.stroke();
+        }
+
         switch(currentState) {
             case StateEnum.idle:
                 currentImage = idleimage;
@@ -153,28 +177,26 @@ function Player(startLife)
 
     this.checkAttack = function(rect) 
     {        
-        for (var i = 0; i < Enemies.length; i++) 
+        /* for (var i = 0; i < Enemies.length; i++) 
         {
             var item = Enemies[i];
             if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
                 (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
             {
-                Enemies.splice(i, 1 );
-                i--;
+                Enemies[i].die();
             }
-        }
-        /* Enemies.forEach(function(item, index){
+        } */
+        Enemies.forEach(function(item, index){
             if((item.rect.x > rect.x && item.rect.x < rect.x + rect.width) ||
                 (item.rect.x + item.rect.width > rect.x && item.rect.x + item.rect.width < rect.x + rect.width))
             {
-                var index = Enemies.indexOf(obj);
                 if(index >= 0)
                 {
-                    Enemies.splice(index, 1 );
-                    damage();
+                    Enemies[index].die();
+                    this.points++;
                 }
             }
-        }); */
+        });
     }
 }
 
@@ -184,6 +206,7 @@ function Enemy(pos, width, height, speed, src)
     this.speed = speed;
     this.image = new Image();
     this.posY = canvas.height/2;
+    var dead = false;
 
     this.rect = 
     {
@@ -195,14 +218,21 @@ function Enemy(pos, width, height, speed, src)
 
     this.update = function()
     {
-        ctx.drawImage(this.image, pos, this.posY, this.image.width/5, this.image.height/5); 
-        this.pos += speed;
-        player.checkHit(this.rect, this);
+        if(!dead)
+        {
+            ctx.drawImage(this.image, pos, this.posY, this.image.width/5, this.image.height/5); 
+            this.pos += speed;
+            player.checkHit(this.rect, this);
+        }
+        else
+        {
+            this.pos = 10000;
+        }
     }
 
     this.die = function()
     {
-
+        dead = true;
     }
 }
 //**********************************************************************************
@@ -247,6 +277,7 @@ onload = function () {
     }, false);
 
     currentScreen = ScreensEnum.menu;
+    currentMode = ModeEnum.easy;
     setInterval(update,30);
 }
 
@@ -308,6 +339,7 @@ function update()
             break;
         case ScreensEnum.game:
             drawGame();
+            game();
             break;
         case ScreensEnum.end:
             drawEnd();
@@ -315,6 +347,12 @@ function update()
         default:
             break;
     }
+}
+
+function game()
+{
+    spawnEnemies();
+
 }
 
 function drawBackground()
@@ -345,6 +383,7 @@ function drawGame()
     {
         drawPlayer();
         drawEnemies();
+        drawScore();
     }
 }
 
@@ -358,6 +397,11 @@ function drawEnemies()
     Enemies.forEach(function(item, index){
         item.update();
     });
+}
+
+function drawScore()
+{
+    writeOnCanvas(ctx, player.points, "32pt arial", "black", canvas.width - 100, 70, "center");
 }
 
 function drawEnd()
