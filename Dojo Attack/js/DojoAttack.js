@@ -96,10 +96,10 @@ function KeyDownHandler(event)
     switch(event.keyCode)
     {
         case 37:
-            player.AttackLeft();
+            player.Attack(true);
             break;
         case 39:
-            player.AttackRight();
+            player.Attack(false);
             break;
         default:
             break;

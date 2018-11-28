@@ -64,8 +64,7 @@ function Player(startLife)
     }
 
     this.draw = function()
-    {       
-        //drawRect(this.centerRect.x, this.centerRect.y, this.centerRect.width, this.centerRect.height);  
+    {        
         if(currentMode == ModeEnum.easy)
         {
             drawRect(this.leftRect.x, this.leftRect.y, this.leftRect.width, this.leftRect.height); 
@@ -90,33 +89,23 @@ function Player(startLife)
         }
     }
 
-    this.AttackLeft = function()
-    {
-        if(canAttack)
-        {
-            canAttack = false;
-            attacked = true;
-            currentState = StateEnum.left;
-            this.checkAttack(this.leftRect);
-    
-            /* setTimeout(function () {
-                currentState = StateEnum.idle;
-            }, 500); */
-        }
-    }
 
-    this.AttackRight = function()
+    this.Attack = function(left)
     {
         if(canAttack)
         {
             canAttack = false;
             attacked = true;
-            currentState = StateEnum.right;
-            this.checkAttack(this.rightRect);
-    
-            /* setTimeout(function () {
-                currentState = StateEnum.idle;
-            }, 500); */
+            if(left)
+            {
+                currentState = StateEnum.left;
+                this.checkAttack(this.leftRect);
+            }
+            else
+            {
+                currentState = StateEnum.right;
+                this.checkAttack(this.rightRect);
+            }
         }
     }
 
