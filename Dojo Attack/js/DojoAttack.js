@@ -87,6 +87,8 @@ function Player(startLife)
         {
             currentScreen = ScreensEnum.end;
             clearInterval(spawnIntervalTimer);
+            GameStarted = false;
+            GameRunning = false;
         }
     }
 
@@ -210,18 +212,7 @@ function Player(startLife)
 function Enemy(speed, left)
 {
     var pos;
-    var image;
-
-    if(left)
-    {
-        pos = [-50,canvas.height/2];
-        this.image.src = leftsrc;
-    }
-    else
-    {
-        pos = [canvas.width,canvas.height/2];
-        image.src = rightsrc;
-    }
+    var image = new Image();
 
     this.speed = speed;
     var dead = false;
@@ -229,10 +220,21 @@ function Enemy(speed, left)
     var rightsrc = "../imagens/inimigo/enemyright.png";
     var smokesrc = "../imagens/inimigo/smoke.png";
 
+    if(left)
+    {
+        pos = [-350,canvas.height/2];
+        image.src = leftsrc;
+    }
+    else
+    {
+        pos = [canvas.width,canvas.height/2];
+        image.src = rightsrc;
+    }
+
     this.rect = 
     {
-        x:this.pos[0],
-        y:this.pos[1],
+        x:pos[0],
+        y:pos[1],
         width:image.width/5,
         height:image.height/5
     }
@@ -241,15 +243,15 @@ function Enemy(speed, left)
     {
         if(!dead)
         {
-            ctx.drawImage(this.image, pos[0], pos[1], this.image.width/5, this.image.height/5); 
+            ctx.drawImage(image, pos[0], pos[1], image.width/5, image.height/5); 
             pos[0] += speed;
             player.checkHit(this.rect, this);
         }
         else
         {
-            this.image.src = smokesrc;
-            this.image.style.display = "none";
-            this.pos = 10000;
+            image.src = smokesrc;
+            image.style.display = "none";
+            pos = [10000,10000];
         }
     }
 
@@ -427,51 +429,59 @@ function startSpawn()
     var timeInterval;
     switch(currentMode) {
         case ModeEnum.easy:
-            timeInterval = 1.5;
+            spawnEnemies(1.5, 2.5);
             break;
         case ModeEnum.normal:
-            timeInterval = 1;
+            spawnEnemies(1, 1.5);
             break;
         case ModeEnum.hard:
-            timeInterval = 0.5;
+            spawnEnemies(0.5, 1);
             break;
         default:
             break;
     }
 
-    spawnIntervalTimer = setInterval(spawnEnemies, timeInterval);
+    //spawnIntervalTimer = setInterval(spawnEnemies, timeInterval * 1000);
 }
 
-function spawnEnemies()
+function spawnEnemies(min, max)
 {
-    var randVel;
-    var randPos = Math.floor(Math.random() * 2);
-    var pos;
-
-    if(randPos == 0)
-    {
-        pos = [-50,canvas.height/2];
-    }
-    else
-    {
-        pos = [canvas.width,canvas.height/2];
-    }
+    var vel;
+    var left;
+    var rand = Math.random();
     
     switch(currentMode) {
         case ModeEnum.easy:
-            randVel = Math.random() * 2 + 0.1;
+            vel = 2;
             break;
         case ModeEnum.normal:
-            randVel = Math.random() * 4 + 2.2;
+            vel = 4;
             break;
         case ModeEnum.hard:
-            randVel = Math.random() * 6 + 6.7;
+            vel = 6;
             break;
         default:
             break;
     }
 
-    Enemies.push(new Enemy(pos, 1,1,randVel,!randPos));
+    if(rand > 0.5)
+    {
+        left = true;
+    }
+    else
+    {
+        left = false;
+        vel *= -1;
+    }
+
+    Enemies.push(new Enemy(vel,left));
+
+    setTimeout(function () {
+        if(GameRunning = true)
+        {
+            spawnEnemies(min, max);
+        }
+    }, ((Math.random() * max) + min) * 1000);
 }
 
 function drawBackground()
