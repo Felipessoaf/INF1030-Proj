@@ -65,7 +65,7 @@ function Player(startLife)
 
     this.draw = function()
     {       
-        drawRect(this.centerRect.x, this.centerRect.y, this.centerRect.width, this.centerRect.height);  
+        //drawRect(this.centerRect.x, this.centerRect.y, this.centerRect.width, this.centerRect.height);  
         if(currentMode == ModeEnum.easy)
         {
             drawRect(this.leftRect.x, this.leftRect.y, this.leftRect.width, this.leftRect.height); 
@@ -92,8 +92,8 @@ function Player(startLife)
 
     this.AttackLeft = function()
     {
-        /* if(canAttack)
-        { */
+        if(canAttack)
+        {
             canAttack = false;
             attacked = true;
             currentState = StateEnum.left;
@@ -102,13 +102,13 @@ function Player(startLife)
             /* setTimeout(function () {
                 currentState = StateEnum.idle;
             }, 500); */
-        /* } */
+        }
     }
 
     this.AttackRight = function()
     {
-        /* if(canAttack)
-        { */
+        if(canAttack)
+        {
             canAttack = false;
             attacked = true;
             currentState = StateEnum.right;
@@ -117,7 +117,7 @@ function Player(startLife)
             /* setTimeout(function () {
                 currentState = StateEnum.idle;
             }, 500); */
-       /*  } */
+        }
     }
 
     this.Stop = function()
@@ -128,12 +128,13 @@ function Player(startLife)
             currentState = StateEnum.idle;
             setTimeout(function () {
                 canAttack = true;
-            }, 500);
+            }, 300);
         }
     }
 
     this.checkAttack = function(rect) 
     {        
+        var point = false;
         var middle = rect.x + rect.width/2;
         Enemies.forEach(function(item, index){
             if((middle > item.rect.x && middle < item.rect.x + item.rect.width))
@@ -141,10 +142,14 @@ function Player(startLife)
                 if(index >= 0)
                 {
                     item.die();
-                    this.points++;
-                    console.log("point: " + this.points);
+                    point = true;
                 }
             }
         });
+
+        if(point)
+        {
+            this.points++;
+        }
     }
 }

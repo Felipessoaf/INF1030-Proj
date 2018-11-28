@@ -181,13 +181,13 @@ function startSpawn()
     var timeInterval;
     switch(currentMode) {
         case ModeEnum.easy:
-            spawnEnemies(1.5, 2.5);
+            spawnEnemies(2, 4);
             break;
         case ModeEnum.normal:
-            spawnEnemies(1, 1.5);
+            spawnEnemies(1.2, 1.6);
             break;
         case ModeEnum.hard:
-            spawnEnemies(0.5, 1);
+            spawnEnemies(0.6, 0.6);
             break;
         default:
             break;
@@ -204,13 +204,13 @@ function spawnEnemies(min, max)
     
     switch(currentMode) {
         case ModeEnum.easy:
-            vel = 2;
+            vel = 3;
             break;
         case ModeEnum.normal:
-            vel = 4;
+            vel = 5;
             break;
         case ModeEnum.hard:
-            vel = 6;
+            vel = 15;
             break;
         default:
             break;
