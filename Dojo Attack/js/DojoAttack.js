@@ -20,10 +20,14 @@ onload = function () {
     Buttons.push(new Button("Menu", ScreensEnum.end, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
     {
         DifficultyOptions.style.display = "block";
-        
+
+        GameStarted = false;
+        GameRunning = false;
+
         Enemies = [];
         player.life = initialLife;
         currentScreen = ScreensEnum.menu;
+        player.points = 0;
     }));
 
     Enemies = new Array();
@@ -146,7 +150,7 @@ function game()
     if(!GameRunning)
     {
         DifficultyOptions.style.display = "none";
-        writeOnCanvas(ctx, "Game On!", "32pt arial", "black", canvas.width/2, canvas.height/2, "center");
+        writeOnCanvas(ctx, "Game On!", "32pt verdana", "black", canvas.width/2, canvas.height/2, "center");
         if(!GameStarted)
         {
             switch(DifficultyOptions.selectedIndex) {
@@ -202,10 +206,10 @@ function spawnEnemies(min, max)
     
     switch(currentMode) {
         case ModeEnum.easy:
-            vel = 3;
+            vel = 4;
             break;
         case ModeEnum.normal:
-            vel = 5;
+            vel = 7;
             break;
         case ModeEnum.hard:
             vel = 15;
@@ -242,7 +246,7 @@ function drawBackground()
 
 function drawMenu()
 {
-    writeOnCanvas(ctx, "Dojo Attack", "32pt arial", "black", canvas.width/2, 70, "center");
+    writeOnCanvas(ctx, "Dojo Attack", "30pt verdana", "white", canvas.width/2, 70, "center");
 }
 
 function drawGame()
@@ -267,16 +271,16 @@ function drawEnemies()
 
 function drawScore()
 {
-    writeOnCanvas(ctx, "Pontos: " + player.points, "32pt arial", "black", canvas.width - 100, 70, "center");
+    writeOnCanvas(ctx, "Pontos: " + player.points, "32pt verdana", "black", canvas.width/2, 70, "center");
 }
 
 function drawLife()
 {
-    writeOnCanvas(ctx, "Vida: " + player.life, "32pt arial", "black", 100, 70, "center");
+    writeOnCanvas(ctx, "Vida: " + player.life, "32pt verdana", "black", 100, 70, "center");
 }
 
 function drawEnd()
 {
-    writeOnCanvas(ctx, "Finish!", "32pt arial", "black", canvas.width/2, canvas.height/2-100, "center");
-    writeOnCanvas(ctx, "Pontos: " + player.points, "32pt arial", "black", canvas.width/2, canvas.height/2-50, "center");
+    writeOnCanvas(ctx, "Finish!", "32pt verdana", "black", canvas.width/2, canvas.height/2-100, "center");
+    writeOnCanvas(ctx, "Pontos: " + player.points, "32pt verdana", "black", canvas.width/2, canvas.height/2-50, "center");
 }
