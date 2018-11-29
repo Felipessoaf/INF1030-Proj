@@ -127,7 +127,7 @@ function Player(startLife)
         Enemies.forEach(function(item, index){
             if((middle > item.rect.x && middle < item.rect.x + item.rect.width))
             {
-                if(index >= 0)
+                if(index >= 0 && !item.dead)
                 {
                     item.die();
                     point = true;
