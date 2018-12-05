@@ -1,4 +1,4 @@
-function Enemy(speed, left)
+function Enemy(speed, left, scope)
 {
     var pos;
 
@@ -38,18 +38,17 @@ function Enemy(speed, left)
     {
         if(this.canUpdate)
         {
-            //drawRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height); 
             if(!this.dead)
             {
-                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                scope.ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
                 pos[0] += speed;
                 this.rect.x += speed;
-                player.checkHit(this.rect, this);
+                scope.player.checkHit(this.rect, this);
             }
             else
             {
                 currentImage = smokeimage;
-                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                scope.ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
                 setTimeout(function () {
                     currentImage.style.display = "none";
                     pos = [10000,10000];
