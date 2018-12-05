@@ -1,4 +1,4 @@
-function Player(startLife, scope)
+function Player(startLife)
 {
     this.life = startLife;
     this.points = 0;
@@ -42,9 +42,9 @@ function Player(startLife, scope)
         this.life--;
         if(this.life <= 0)
         {
-            scope.currentScreen = ScreensEnum.end;
-            scope.GameStarted = false;
-            scope.GameRunning = false;
+            currentScreen = ScreensEnum.end;
+            GameStarted = false;
+            GameRunning = false;
         }
     }
 
@@ -53,10 +53,10 @@ function Player(startLife, scope)
         if(!(hitRect.x > (this.centerRect.x + this.centerRect.width) || 
             (hitRect.x + hitRect.width) < this.centerRect.x))
         {
-            var index = scope.Enemies.indexOf(obj);
+            var index = Enemies.indexOf(obj);
             if(index >= 0)
             {
-                scope.Enemies[index].die();
+                Enemies[index].die();
                 this.damage();
             }
         }
@@ -64,24 +64,24 @@ function Player(startLife, scope)
 
     this.draw = function()
     {        
-        if(scope.currentMode == scope.ModeEnum.Facil)
+        if(currentMode == ModeEnum.Facil)
         {
-            scope.drawRect(this.leftRect.x, this.leftRect.y, this.leftRect.width, this.leftRect.height); 
-            scope.drawRect(this.rightRect.x, this.rightRect.y, this.rightRect.width, this.rightRect.height); 
+            drawRect(this.leftRect.x, this.leftRect.y, this.leftRect.width, this.leftRect.height); 
+            drawRect(this.rightRect.x, this.rightRect.y, this.rightRect.width, this.rightRect.height); 
         }
 
         switch(currentState) {
             case StateEnum.idle:
                 currentImage = idleimage;
-                scope.ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
                 break;
             case StateEnum.left:
                 currentImage = leftimage;
-                scope.ctx.drawImage(currentImage, pos[0]-70, pos[1], currentImage.width/5, currentImage.height/5); 
+                ctx.drawImage(currentImage, pos[0]-70, pos[1], currentImage.width/5, currentImage.height/5); 
                 break;
             case StateEnum.right:
                 currentImage = rightimage;
-                scope.ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
+                ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
                 break;
             default:
                 break;
@@ -124,7 +124,7 @@ function Player(startLife, scope)
     {        
         var point = false;
         var middle = rect.x + rect.width/2;
-        scope.Enemies.forEach(function(item, index){
+        Enemies.forEach(function(item, index){
             if((middle > item.rect.x && middle < item.rect.x + item.rect.width))
             {
                 if(index >= 0 && !item.dead)

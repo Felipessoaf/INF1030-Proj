@@ -10,19 +10,23 @@ onload = function () {
         var ctx = canvas.getContext("2d");
 
         var initialLife = 3;
-        var player = new Player(initialLife, this);
+        var player = new Player(initialLife);
+        player.bind(this);
         var GameStarted = false;
         var GameRunning = false;
 
         var Enemies = new Array();
 
         var Buttons = new Array();
-        Buttons.push(new Button("Start", ScreensEnum.menu, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, this, function()
+        var button = new Button("Start", ScreensEnum.menu, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, this, function()
         {
             player.life = initialLife;
             currentScreen = ScreensEnum.game;
-        }));
-        Buttons.push(new Button("Menu", ScreensEnum.end, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, this, function()
+        });
+        button.bind(this);
+        Buttons.push(button);
+        
+        button = new Button("Menu", ScreensEnum.end, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, this, function()
         {
             DifficultyOptions.style.display = "block";
 
@@ -33,7 +37,9 @@ onload = function () {
             player.life = initialLife;
             currentScreen = ScreensEnum.menu;
             player.points = 0;
-        }));
+        });
+        button.bind(this);
+        Buttons.push(button);
 
         var DifficultyOptions = document.getElementById("difficultyOptions");
         var Difficulties = new Array();
@@ -228,7 +234,9 @@ onload = function () {
                 vel *= -1;
             }
         
-            Enemies.push(new Enemy(vel,left, this));
+            var enemy = new Enemy(vel,left);
+            enemy.bind(this);
+            Enemies.push(enemy);
         
             setTimeout(function () {
                 if(GameRunning = true)

@@ -1,4 +1,4 @@
-function Button(name, screen, pos, width, height, scope, onClick)
+function Button(name, screen, pos, width, height, onClick)
 {
     this.pos = pos;
     this.width = width;
@@ -7,7 +7,7 @@ function Button(name, screen, pos, width, height, scope, onClick)
 
     this.click = function (click) 
     {
-        if(screen == scope.currentScreen)
+        if(screen == currentScreen)
         {
             if(click.x > this.pos[0] && click.x < this.pos[0] + this.width 
                 && click.y < this.pos[1] + this.height && click.y > this.pos[1])
@@ -19,12 +19,11 @@ function Button(name, screen, pos, width, height, scope, onClick)
 
     this.draw = function()
     {
-        console.log("s");
-        if(screen == scope.currentScreen)
+        if(screen == currentScreen)
         {
-            scope.drawRect(this.pos[0], this.pos[1], this.width, this.height); 
+            drawRect(this.pos[0], this.pos[1], this.width, this.height); 
             
-            writeOnCanvas(scope.ctx, this.name, "32pt arial", "black", this.pos[0] + this.width/2, this.pos[1] + this.height/2, "center");
+            writeOnCanvas(ctx, this.name, "32pt arial", "black", this.pos[0] + this.width/2, this.pos[1] + this.height/2, "center");
         }
     }
 }
