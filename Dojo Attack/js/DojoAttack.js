@@ -1,8 +1,11 @@
 onload = function () {
+    //Função de escopo, para não ter nenhuma variável global
     (function ()
     {
+        //Classe player
         function Player(startLife)
         {
+            //Inicializa variaveis
             this.life = startLife;
             this.points = 0;
 
@@ -16,6 +19,7 @@ onload = function () {
             var canAttack = true;
             var attacked = false;
 
+            //Rect do ataque da esquerda
             this.leftRect = 
             {
                 x:pos[0] - 80,
@@ -24,6 +28,7 @@ onload = function () {
                 height:100
             }
 
+            //Rect do ataque da direita
             this.rightRect = 
             {
                 x:pos[0] + 330,
@@ -32,6 +37,7 @@ onload = function () {
                 height:100
             }
 
+            //Rect do centro
             this.centerRect = 
             {
                 x:pos[0] + 70,
@@ -40,6 +46,7 @@ onload = function () {
                 height:idleimage.height/5 - 20
             }
 
+            //Função que trata dano no player
             this.damage = function()
             {
                 this.life--;
@@ -51,6 +58,7 @@ onload = function () {
                 }
             }
 
+            //Função que checa se um inimigo bateu no player
             this.checkHit = function(hitRect, obj)
             {
                 if(!(hitRect.x > (this.centerRect.x + this.centerRect.width) || 
@@ -65,14 +73,17 @@ onload = function () {
                 }
             }
 
+            //Função que desenha os elementos do player
             this.draw = function()
             {        
+                //desenha rects de apoio no modo facil
                 if(currentMode == ModeEnum.Facil)
                 {
                     drawRect(this.leftRect.x, this.leftRect.y, this.leftRect.width, this.leftRect.height); 
                     drawRect(this.rightRect.x, this.rightRect.y, this.rightRect.width, this.rightRect.height); 
                 }
 
+                //Troca imagem dependendo do estado
                 switch(currentState) {
                     case StateEnum.idle:
                         currentImage = idleimage;
@@ -91,7 +102,7 @@ onload = function () {
                 }
             }
 
-
+            //Função que trata ataque do player
             this.Attack = function(left)
             {
                 if(canAttack)
@@ -111,6 +122,7 @@ onload = function () {
                 }
             }
 
+            //Função chamada após um ataque do player
             this.Stop = function()
             {
                 if(attacked)
@@ -123,6 +135,7 @@ onload = function () {
                 }
             }
 
+            //Função que checa se player atingiu um inimigo
             this.checkAttack = function(rect) 
             {        
                 var point = false;
@@ -145,8 +158,10 @@ onload = function () {
             }
         }
 
+        //Classe inimigo
         function Enemy(speed, left)
         {
+            //Inicializa variaveis
             var pos;
 
             this.speed = speed;
@@ -173,6 +188,7 @@ onload = function () {
                 currentImage = rightimage;
             }
 
+            //rect do inimigo
             this.rect = 
             {
                 x:pos[0],
@@ -181,6 +197,7 @@ onload = function () {
                 height:currentImage.height/5
             }
 
+            //Função update do inimigo, trata do funcionamento do mesmo
             this.update = function()
             {
                 if(this.canUpdate)
@@ -190,6 +207,8 @@ onload = function () {
                         ctx.drawImage(currentImage, pos[0], pos[1], currentImage.width/5, currentImage.height/5); 
                         pos[0] += speed;
                         this.rect.x += speed;
+
+                        //checa se bateu no player
                         player.checkHit(this.rect, this);
                     }
                     else
@@ -205,19 +224,23 @@ onload = function () {
                 }
             }
 
+            //Chamada quando inimigo morre
             this.die = function()
             {
                 this.dead = true;
             }
         }
 
+        //Classe botão
         function Button(name, screen, pos, width, height, onClick)
         {
+            //Inicializa variaveis
             this.pos = pos;
             this.width = width;
             this.height = height;
             this.name = name;
 
+            //Função que trata o clique do botão, e chama callback recebida por parametro
             this.click = function (click) 
             {
                 if(screen == currentScreen)
@@ -230,6 +253,7 @@ onload = function () {
                 }
             };
 
+            //Função que desenha o botao
             this.draw = function()
             {
                 if(screen == currentScreen)
@@ -241,6 +265,7 @@ onload = function () {
             }
         }
 
+        //Inicializa variaveis "globais"
         var ScreensEnum = Object.freeze({"menu":1, "game":2, "end":3});
         var currentScreen;
         var ModeEnum = Object.freeze({"Facil":1, "Medio":2, "Dificil":3});
@@ -254,8 +279,10 @@ onload = function () {
         var GameStarted = false;
         var GameRunning = false;
 
+        //Inicializa vetor de inimigos
         var Enemies = new Array();
 
+        //Inicializa vetor de botoes
         var Buttons = new Array();
         Buttons.push(new Button("Start", ScreensEnum.menu, [canvas.width/2 - 50, canvas.height/2 - 20], 100, 60, function()
         {
@@ -275,29 +302,35 @@ onload = function () {
             player.points = 0;
         }));
 
-        var DifficultyOptions = document.getElementById("difficultyOptions");
+        //Inicializa vetor de dificuldades
         var Difficulties = new Array();
+        var DifficultyOptions = document.getElementById("difficultyOptions");
+
         for(var mode in ModeEnum)
         {
             Difficulties.push(mode);
         }
         
+        //Preenche select
         Difficulties.forEach(function(item, index){
             var option = document.createElement("option");
             option.text = item;
             DifficultyOptions.add(option);
         });
 
+        //Trata clicks do canvas
         canvas.addEventListener('click', function(evt)
         {
             ClickHandler(evt);
         }, false);
 
+        //Trata input (down) de teclas da janela
         window.addEventListener("keydown", function(evt)
         {
             KeyDownHandler(evt);
         }, false);
 
+        //Trata input (up) de teclas da janela
         window.addEventListener("keyup", function(evt)
         {
             player.Stop();
@@ -305,8 +338,11 @@ onload = function () {
 
         currentScreen = ScreensEnum.menu;
         currentMode = ModeEnum.Facil;
+
+        //Começa update do jogo
         setInterval(update,30);
 
+        //Converte posição do mouse para canvas
         function getMousePos(canvas, event) 
         {
             var rect = canvas.getBoundingClientRect();
@@ -316,6 +352,7 @@ onload = function () {
             };
         }
         
+        //Função que escreve no canvas
         function writeOnCanvas(c, texto, fonte, corfonte, posX, posY, align)
         {
             c.font = fonte;
@@ -326,6 +363,7 @@ onload = function () {
             c.fillText(texto, posX, posY);
         }
         
+        //Trata clicks do canvas
         function ClickHandler(event)
         {
             var mousePos = getMousePos(canvas, event);
@@ -335,6 +373,7 @@ onload = function () {
             });
         }
         
+        //Trata input (down) de teclas da janela
         function KeyDownHandler(event)
         {
             switch(event.keyCode)
@@ -350,6 +389,7 @@ onload = function () {
             }
         }
         
+        //Desenha um rect
         function drawRect(x,y,w,h)
         {
             ctx.beginPath();
@@ -361,15 +401,19 @@ onload = function () {
             ctx.stroke();
         }
         
+        //Update geral do jogo
         function update()
         {
+            //Limpa a tela
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBackground();
         
+            //Desenha cada botao
             Buttons.forEach(function(item, index){
                 item.draw();
             });
             
+            //Desenha tela baseado na corrente
             switch(currentScreen) {
                 case ScreensEnum.menu:
                     drawMenu();
@@ -385,6 +429,7 @@ onload = function () {
             }
         }
         
+        //Trata do update do jogo 
         function game()
         {    
             if(!GameRunning)
@@ -393,6 +438,7 @@ onload = function () {
                 writeOnCanvas(ctx, "Game On!", "32pt verdana", "black", canvas.width/2, canvas.height/2, "center");
                 if(!GameStarted)
                 {
+                    //Pega a dificuldade pelo select
                     switch(DifficultyOptions.selectedIndex) {
                         case 0:
                             currentMode = ModeEnum.Facil;
@@ -416,10 +462,12 @@ onload = function () {
             }
             else
             {
+                //desenha o jogo
                 drawGame();
             }
         }
         
+        //Começa o spawn dos inimigos
         function startSpawn()
         {
             var timeInterval;
@@ -438,12 +486,14 @@ onload = function () {
             }
         }
         
+        //Sistema de spawn dos inimigos
         function spawnEnemies(min, max)
         {
             var vel;
             var left;
             var rand = Math.random();
             
+            //Muda a velocidade baseado na dificuldade
             switch(currentMode) {
                 case ModeEnum.Facil:
                     vel = 4;
@@ -458,6 +508,7 @@ onload = function () {
                     break;
             }
         
+            //Aleatoriza lado que o inimigo aparece
             if(rand > 0.5)
             {
                 left = true;
@@ -468,9 +519,11 @@ onload = function () {
                 vel *= -1;
             }
         
+            //Cria e adiciona inimigo no array
             var enemy = new Enemy(vel,left);
             Enemies.push(enemy);
         
+            //Spawna proximo inimigo depois de um tempo randomizado entre o minimo e maximo possivel
             setTimeout(function () {
                 if(GameRunning = true)
                 {
@@ -479,17 +532,20 @@ onload = function () {
             }, ((Math.random() * max) + min) * 1000);
         }
         
+        //Desenha background
         function drawBackground()
         {
             var image = document.getElementById("bgimg");
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height); 
         }
         
+        //Desenha menu
         function drawMenu()
         {
             writeOnCanvas(ctx, "Dojo Attack", "30pt verdana", "white", canvas.width/2, 70, "center");
         }
         
+        //Desenha jogo
         function drawGame()
         {
             drawPlayer();
@@ -498,11 +554,13 @@ onload = function () {
             drawLife();
         }
         
+        //Desenha player
         function drawPlayer()
         {
             player.draw();
         }
         
+        //Desenha inimigos
         function drawEnemies()
         {
             Enemies.forEach(function(item, index){
@@ -510,16 +568,19 @@ onload = function () {
             });
         }
         
+        //Desenha pontos
         function drawScore()
         {
             writeOnCanvas(ctx, "Pontos: " + player.points, "32pt verdana", "black", canvas.width/2, 70, "center");
         }
         
+        //Desenha vida
         function drawLife()
         {
             writeOnCanvas(ctx, "Vida: " + player.life, "32pt verdana", "black", 100, 70, "center");
         }
         
+        //Desenha final
         function drawEnd()
         {
             writeOnCanvas(ctx, "Finish!", "32pt verdana", "black", canvas.width/2, canvas.height/2-100, "center");
